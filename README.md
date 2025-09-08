@@ -1,6 +1,15 @@
-# e_nur_quran
+# E-Nur Quran - Aplikasi Al-Quran Digital Indonesia
 
-A new Flutter project.
+## Deskripsi
+E-Nur Quran adalah aplikasi Al-Quran digital yang dapat bekerja secara offline. Aplikasi ini menyediakan fitur-fitur seperti:
+
+- 📖 Baca Al-Quran dengan terjemahan Indonesia
+- 🔍 Pencarian surah dan ayat
+- 🔖 Bookmark ayat favorit
+- 🕐 Jadwal shalat
+- 🎵 Audio Al-Quran dari berbagai qari
+- 🌙 Mode gelap dan terang
+- 📱 Interface yang mirip dengan Quran Indonesia
 
 ## Getting Started
 
@@ -270,3 +279,246 @@ flutter run -t lib/main.dart
 
 86 directories, 158 files
 ```
+
+## Setup dan Instalasi
+
+### 1. Prerequisites
+- Flutter SDK (>=3.0.0)
+- Android Studio / VS Code
+- Android SDK / Xcode (untuk iOS)
+
+### 2. Clone dan Setup
+```bash
+git clone <repository-url>
+cd e_nur_quran
+flutter pub get
+```
+
+### 3. Generate Hive Adapters
+```bash
+flutter packages pub run build_runner build
+```
+
+### 4. Folder Structure
+```
+lib/
+├── core/
+│   ├── di/                 # Dependency Injection
+│   ├── error/             # Error handling
+│   ├── theme/             # App theming
+│   ├── usecase/           # Base use case
+│   └── utils/             # Constants & utilities
+├── data/
+│   ├── datasources/       # Local & Remote data sources
+│   ├── models/            # Data models
+│   └── repositories/      # Repository implementations
+├── domain/
+│   ├── entities/          # Business entities
+│   ├── repositories/      # Repository interfaces
+│   └── usecases/          # Business logic use cases
+└── presentation/
+    ├── bloc/              # State management
+    ├── pages/             # UI screens
+    └── widgets/           # Reusable components
+```
+
+### 5. Assets Setup
+Buat folder berikut di root project:
+```
+assets/
+├── animations/
+│   ├── splash.json
+│   ├── loading.json
+│   └── no_internet.json
+├── images/
+│   ├── app_logo.png
+│   └── islamic_pattern.png
+└── fonts/
+    ├── Amiri-Regular.ttf
+    └── Amiri-Bold.ttf
+```
+
+### 6. Android Configuration
+Di `android/app/src/main/AndroidManifest.xml`, tambahkan permissions:
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+```
+
+### 7. iOS Configuration (Optional)
+Di `ios/Runner/Info.plist`, tambahkan:
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Aplikasi ini memerlukan lokasi untuk menampilkan jadwal shalat yang akurat</string>
+```
+
+## Fitur Utama
+
+### 1. Home Dashboard
+- Greeting dan search bar
+- Last read surah
+- Prayer times widget
+- Quick access menu
+- Popular surahs
+
+### 2. Surah List
+- Daftar lengkap 114 surah
+- Search functionality
+- Makki/Madani indicators
+- Ayat count dan arti
+
+### 3. Surah Detail
+- Arabic text dengan font Amiri
+- Latin transliteration
+- Indonesian translation
+- Audio playback controls
+- Bookmark functionality
+- Share ayat
+
+### 4. Offline Capability
+- Automatic data caching dengan Hive
+- Priority download untuk surah populer
+- Offline-first architecture
+
+## API Integration
+
+### Base URL
+```
+https://equran.id/api/v2
+```
+
+### Endpoints:
+- `GET /surat` - Daftar semua surah
+- `GET /surat/{id}` - Detail surah dengan ayat
+- `GET /tafsir/{id}` - Tafsir surah
+
+### Response Example:
+```json
+{
+  "code": 200,
+  "message": "Data retrieved successfully",
+  "data": {
+    "nomor": 1,
+    "nama": "الفاتحة",
+    "namaLatin": "Al-Fatihah",
+    "jumlahAyat": 7,
+    "tempatTurun": "Mekah",
+    "arti": "Pembukaan"
+  }
+}
+```
+
+## State Management
+
+Aplikasi menggunakan **Flutter BLoC** untuk state management:
+
+### BLoC Classes:
+- `SurahListBloc` - Manages surah list state
+- `SurahDetailBloc` - Manages individual surah state
+- `PrayerTimeBloc` - Manages prayer times
+- `QuranAudioBloc` - Manages audio playback
+
+## Local Storage
+
+### Hive Boxes:
+- `surah_box` - Cached surah list
+- `ayat_box` - Cached ayat data
+- `settings_box` - App settings
+- `bookmark_box` - User bookmarks
+
+## Dependencies
+
+### Core Dependencies:
+```yaml
+flutter_bloc: ^8.1.6        # State management
+hive: ^2.2.3                # Local database
+dio: ^5.7.0                 # HTTP client
+connectivity_plus: ^6.0.5   # Network status
+lottie: ^3.1.2              # Animations
+```
+
+### Audio & Media:
+```yaml
+just_audio: ^0.9.40         # Audio playback
+```
+
+### UI & Utilities:
+```yaml
+intl: ^0.19.0               # Internationalization
+shared_preferences: ^2.3.2  # Simple storage
+permission_handler: ^11.3.1 # Permissions
+```
+
+## Development Notes
+
+### Clean Architecture
+Aplikasi mengikuti prinsip Clean Architecture:
+- **Presentation Layer**: UI components dan BLoC
+- **Domain Layer**: Business logic dan entities
+- **Data Layer**: Data sources dan repositories
+
+### Error Handling
+```dart
+abstract class Failure {
+  final String message;
+  const Failure(this.message);
+}
+
+class NetworkFailure extends Failure {
+  const NetworkFailure(String message) : super(message);
+}
+```
+
+### Offline Strategy
+1. **First Launch**: Download critical data (Al-Fatihah, popular surahs)
+2. **Subsequent Usage**: Load from cache, sync when online
+3. **Background Sync**: Update cached data when connected
+
+## Customization
+
+### Theme Colors
+```dart
+static const Color primaryGreen = Color(0xFF2E7D32);
+static const Color lightGreen = Color(0xFF81C784);
+static const Color goldAccent = Color(0xFFFFD700);
+```
+
+### Arabic Font
+- **Font Family**: Amiri (included)
+- **Default Size**: 24px untuk Arab, 16px untuk terjemahan
+- **Line Height**: 1.8 untuk readability
+
+## Performance Optimization
+
+1. **Lazy Loading**: Load ayat on demand
+2. **Image Caching**: Cache downloaded assets
+3. **Memory Management**: Dispose controllers properly
+4. **Network Optimization**: Batch API calls
+
+## Future Enhancements
+
+- [ ] Tafsir integration
+- [ ] Multiple translation support
+- [ ] Prayer time notifications
+- [ ] Qibla direction
+- [ ] Reading progress tracking
+- [ ] Social sharing features
+- [ ] Offline maps for Qibla
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**Developed with ❤️ for Indonesian Muslim community**
